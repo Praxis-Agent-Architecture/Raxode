@@ -1,9 +1,34 @@
-import { cp, mkdir, readdir } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const assetExtensions = new Set([".md", ".json", ".txt", ".yaml", ".yml"]);
 const sourceRoot = path.resolve("raxode-cli");
 const distRoot = path.resolve("dist/raxode-cli");
+
+function rewriteCompiledProjectDescriptor(value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => rewriteCompiledProjectDescriptor(entry));
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, rewriteCompiledProjectDescriptor(entry)]),
+    );
+  }
+  if (typeof value === "string" && value.endsWith(".ts")) {
+    return `${value.slice(0, -3)}.js`;
+  }
+  return value;
+}
+
+async function copyAsset(source, target, relative) {
+  await mkdir(path.dirname(target), { recursive: true });
+  if (relative === "backend/rax.project.json") {
+    const descriptor = JSON.parse(await readFile(source, "utf8"));
+    await writeFile(target, `${JSON.stringify(rewriteCompiledProjectDescriptor(descriptor), null, 2)}\n`, "utf8");
+    return;
+  }
+  await cp(source, target, { force: true });
+}
 
 async function copyAssets(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -21,8 +46,7 @@ async function copyAssets(directory) {
       continue;
     }
     const target = path.join(distRoot, relative);
-    await mkdir(path.dirname(target), { recursive: true });
-    await cp(source, target, { force: true });
+    await copyAsset(source, target, relative);
   }
 }
 

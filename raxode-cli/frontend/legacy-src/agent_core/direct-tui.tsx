@@ -11434,12 +11434,16 @@ function PraxisDirectTuiApp(): JSX.Element {
 
   useEffect(() => {
     const tsxBin = resolve(appRoot, "node_modules/.bin/tsx");
-    const applicationBackendPath = resolve(appRoot, "raxode-cli/backend/legacyDirectApplicationBackend.ts");
-    const useApplicationBackend = existsSync(applicationBackendPath);
-    const sourceBackendPath = useApplicationBackend
-      ? applicationBackendPath
+    const sourceApplicationBackendPath = resolve(appRoot, "raxode-cli/backend/legacyDirectApplicationBackend.ts");
+    const distApplicationBackendPath = resolve(appRoot, "dist/raxode-cli/backend/legacyDirectApplicationBackend.js");
+    const useSourceApplicationBackend = existsSync(sourceApplicationBackendPath);
+    const useDistApplicationBackend = existsSync(distApplicationBackendPath);
+    const sourceBackendPath = useSourceApplicationBackend
+      ? sourceApplicationBackendPath
       : resolve(appRoot, "src/agent_core/live-agent-chat.ts");
-    const distBackendPath = resolve(appRoot, "dist/agent_core/live-agent-chat.js");
+    const distBackendPath = useDistApplicationBackend
+      ? distApplicationBackendPath
+      : resolve(appRoot, "dist/raxode-cli/frontend/legacy-src/agent_core/live-agent-chat.js");
     const configRoot = resolveConfigRoot(appRoot);
     const stateRoot = resolveStateRoot(appRoot);
     const launchWorkspace = backendLaunchWorkspaceRef.current ?? currentCwd;
@@ -11453,10 +11457,10 @@ function PraxisDirectTuiApp(): JSX.Element {
     backendLaunchWorkspaceRef.current = null;
     backendLaunchSessionIdRef.current = null;
     backendLaunchInitialTurnIndexRef.current = null;
-    const backendCommand = useApplicationBackend
+    const backendCommand = useSourceApplicationBackend
       ? process.execPath
       : (existsSync(sourceBackendPath) ? tsxBin : process.execPath);
-    const backendArgs = useApplicationBackend
+    const backendArgs = useSourceApplicationBackend
       ? ["--import", "tsx", sourceBackendPath, "--ui=direct"]
       : existsSync(sourceBackendPath)
       ? [sourceBackendPath, "--ui=direct"]

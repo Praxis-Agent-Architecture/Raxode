@@ -5,6 +5,7 @@
 
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import type {
@@ -30,8 +31,15 @@ type PendingCommand = {
   reject: (error: Error) => void;
 };
 
-function backendServerPath(): string {
-  return fileURLToPath(new URL("../../backend/application/stdioApplicationServer.ts", import.meta.url));
+function backendServerEntrypoint(): { path: string; needsTsx: boolean } {
+  const sourcePath = fileURLToPath(new URL("../../backend/application/stdioApplicationServer.ts", import.meta.url));
+  if (existsSync(sourcePath)) {
+    return { path: sourcePath, needsTsx: true };
+  }
+  return {
+    path: fileURLToPath(new URL("../../backend/application/stdioApplicationServer.js", import.meta.url)),
+    needsTsx: false,
+  };
 }
 
 function parseProtocolLine(line: string): PraxisApplicationProtocolMessage | undefined {
@@ -57,9 +65,12 @@ function spawnApplicationBackend(options: {
   command?: string;
   args?: readonly string[];
 } = {}): ChildProcessWithoutNullStreams {
+  const backendEntrypoint = backendServerEntrypoint();
   return spawn(
     options.command ?? process.execPath,
-    options.args ?? ["--import", "tsx", backendServerPath()],
+    options.args ?? (backendEntrypoint.needsTsx
+      ? ["--import", "tsx", backendEntrypoint.path]
+      : [backendEntrypoint.path]),
     {
       cwd: options.cwd ?? process.cwd(),
       stdio: ["pipe", "pipe", "pipe"],
