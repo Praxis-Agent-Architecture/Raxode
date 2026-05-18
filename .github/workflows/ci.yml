@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+      - name: Install dependencies
+        run: |
+          if npm view @praxis-ai/praxis@0.1.0 version >/dev/null 2>&1; then
+            npm install --package-lock=false
+          else
+            git clone --depth 1 --branch release/0.1.0-praxis-package https://github.com/Praxis-Agent-Architecture/Praxis.git /tmp/praxis
+            npm --prefix /tmp/praxis ci
+            npm --prefix /tmp/praxis run build
+            mkdir -p /tmp/praxis-pack
+            npm --prefix /tmp/praxis pack --pack-destination /tmp/praxis-pack
+            npm install --package-lock=false --no-save /tmp/praxis-pack/praxis-ai-praxis-0.1.0.tgz
+          fi
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm pack --dry-run
