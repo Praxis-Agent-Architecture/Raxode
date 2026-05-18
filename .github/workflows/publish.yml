@@ -32,7 +32,7 @@ jobs:
             npm --prefix /tmp/praxis ci
             npm --prefix /tmp/praxis run build
             mkdir -p /tmp/praxis-pack
-            npm --prefix /tmp/praxis pack --pack-destination /tmp/praxis-pack
+            (cd /tmp/praxis && npm pack --pack-destination /tmp/praxis-pack)
             npm install --package-lock=false --no-save /tmp/praxis-pack/praxis-ai-praxis-0.1.0.tgz
           fi
       - run: npm run build
