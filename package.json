@@ -1,0 +1,67 @@
+{
+  "name": "@praxis-ai/raxode",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Raxode coding agent backend and legacy TUI built on Praxis.",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin/raxode",
+    "dist/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "raxode": "./bin/raxode"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/raxode-cli/index.d.ts",
+      "import": "./dist/raxode-cli/index.js"
+    },
+    "./backend": {
+      "types": "./dist/raxode-cli/backend/raxodeBackend.d.ts",
+      "import": "./dist/raxode-cli/backend/raxodeBackend.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "clean": "node scripts/clean-dist.mjs",
+    "build": "npm run clean && tsc -p tsconfig.build.json && node scripts/copy-dist-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pack:dry": "npm pack --dry-run --json",
+    "test": "npm run test:unit",
+    "test:unit": "node scripts/run-unit-tests.mjs",
+    "test:all": "find raxode-cli -type f -name '*.test.ts' -print0 | xargs -0 node --import tsx --test",
+    "raxode:legacy-tui": "RAXODE_RENDER_FPS=120 RAXODE_STREAM_FPS=120 node --import tsx raxode-cli/frontend/legacy-src/agent_core/direct-tui.tsx",
+    "raxode:cache-xray": "node scripts/raxode-cache-xray.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.138",
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@google/adk": "^0.5.0",
+    "@google/genai": "^1.52.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@openai/agents": "^0.11.4",
+    "@praxis-ai/praxis": "0.1.0",
+    "ink": "^5.2.1",
+    "node-pty": "^1.1.0",
+    "openai": "^6.37.0",
+    "react": "^18.3.1",
+    "string-width": "^7.2.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "@types/react": "^18.3.28",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": ".",
+    "sourceMap": false
+  },
+  "include": ["raxode-cli/**/*.ts", "raxode-cli/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "raxode-cli/**/*.test.ts", "raxode-cli/frontend/legacy-src/memory/generated/**"]
+}

@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+PRG=$0
+while [ -h "$PRG" ]; do
+  LINK=$(ls -ld -- "$PRG")
+  LINK=$(expr "$LINK" : '.*-> \(.*\)$')
+  case "$LINK" in
+    /*) PRG=$LINK ;;
+    *) PRG=$(dirname -- "$PRG")/$LINK ;;
+  esac
+done
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$PRG")" && pwd)
+exec node "$SCRIPT_DIR/../dist/raxode-cli/frontend/legacy-src/raxcode-cli.js" "$@"

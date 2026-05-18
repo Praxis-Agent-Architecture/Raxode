@@ -1,0 +1,37 @@
+{
+  "schema": "praxis.rax.project.v1",
+  "kind": "application-project",
+  "id": "raxode",
+  "entry": "agents/codingAgent/praxis.agent.ts",
+  "export": "default",
+  "application": {
+    "id": "application.raxode.coding"
+  },
+  "agent": {
+    "id": "agent.raxode.coding"
+  },
+  "agents": {
+    "primary": {
+      "entry": "agents/codingAgent/praxis.agent.ts",
+      "export": "default",
+      "id": "agent.raxode.coding"
+    },
+    "tui": {
+      "entry": "agents/tuiAgent/praxis.agent.ts",
+      "export": "default",
+      "id": "agent.raxode.tui"
+    }
+  },
+  "paths": {
+    "application": "application",
+    "authentication": "authentication",
+    "context": "context",
+    "memory": "memory",
+    "topology": "topology",
+    "tests": "tests",
+    "reports": "reports",
+    "primaryAgent": "agents/codingAgent",
+    "tuiAgent": "agents/tuiAgent",
+    "agents": "agents"
+  }
+}
