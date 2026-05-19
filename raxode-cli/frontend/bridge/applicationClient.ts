@@ -6,6 +6,7 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type {
@@ -42,6 +43,21 @@ function backendServerEntrypoint(): { path: string; needsTsx: boolean } {
   };
 }
 
+function resolveTsxLoader(startDir: string): string | null {
+  let current = resolve(startDir);
+  while (true) {
+    const candidate = resolve(current, "node_modules/tsx/dist/loader.mjs");
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
+
 function parseProtocolLine(line: string): PraxisApplicationProtocolMessage | undefined {
   const trimmed = line.trim();
   if (!trimmed) return undefined;
@@ -66,10 +82,11 @@ function spawnApplicationBackend(options: {
   args?: readonly string[];
 } = {}): ChildProcessWithoutNullStreams {
   const backendEntrypoint = backendServerEntrypoint();
+  const tsxLoader = backendEntrypoint.needsTsx ? resolveTsxLoader(dirname(backendEntrypoint.path)) : null;
   return spawn(
     options.command ?? process.execPath,
     options.args ?? (backendEntrypoint.needsTsx
-      ? ["--import", "tsx", backendEntrypoint.path]
+      ? ["--import", tsxLoader ?? "tsx", backendEntrypoint.path]
       : [backendEntrypoint.path]),
     {
       cwd: options.cwd ?? process.cwd(),

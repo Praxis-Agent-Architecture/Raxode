@@ -2,13 +2,37 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
-import { restoreWorkspaceGitCheckpointInSubprocess } from "./workspace-git-checkpoint-subprocess.js";
+import {
+  resolveWorkspaceGitCheckpointRunnerPath,
+  restoreWorkspaceGitCheckpointInSubprocess,
+} from "./workspace-git-checkpoint-subprocess.js";
 import { writeWorkspaceGitCheckpoint } from "./workspace-git-checkpoint.js";
 
 const appRoot = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
+
+test("workspace restore subprocess resolves runner from packaged app root layout", () => {
+  const appRoot = mkdtempSync(join(tmpdir(), "praxis-workspace-restore-package-root-"));
+  try {
+    const runnerPath = join(
+      appRoot,
+      "raxode-cli",
+      "frontend",
+      "legacy-src",
+      "agent_core",
+      "tui-input",
+      "workspace-git-checkpoint-runner.ts",
+    );
+    mkdirSync(dirname(runnerPath), { recursive: true });
+    writeFileSync(runnerPath, "", "utf8");
+
+    assert.equal(resolveWorkspaceGitCheckpointRunnerPath(appRoot, dirname(runnerPath)), runnerPath);
+  } finally {
+    rmSync(appRoot, { recursive: true, force: true });
+  }
+});
 
 test("workspace restore subprocess restores checkpointed files without mutating the caller thread", async () => {
   const home = mkdtempSync(join(tmpdir(), "praxis-workspace-restore-subprocess-home-"));

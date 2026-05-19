@@ -1,11 +1,9 @@
 import { spawn } from "node:child_process";
-import { createRequire } from "node:module";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { WorkspaceGitCheckpointRestoreResult } from "./workspace-git-checkpoint.js";
-
-const require = createRequire(import.meta.url);
 
 interface RestoreWorkspaceGitCheckpointInSubprocessParams {
   appRoot: string;
@@ -36,18 +34,51 @@ function parseRunnerStdout(stdout: string): WorkspaceGitCheckpointRestoreResult 
   return parsed.result;
 }
 
+export function resolveTsxLoader(startDir: string): string | null {
+  let current = resolve(startDir);
+  while (true) {
+    const candidate = resolve(current, "node_modules/tsx/dist/loader.mjs");
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
+
+export function resolveWorkspaceGitCheckpointRunnerPath(
+  appRoot: string,
+  moduleDir = dirname(fileURLToPath(import.meta.url)),
+): string {
+  const sourceRunnerPath = [
+    resolve(moduleDir, "workspace-git-checkpoint-runner.ts"),
+    resolve(appRoot, "raxode-cli/frontend/legacy-src/agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
+    resolve(appRoot, "src/agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
+    resolve(appRoot, "legacy-src/agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
+    resolve(appRoot, "agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
+  ].find((candidate) => existsSync(candidate));
+  if (sourceRunnerPath) {
+    return sourceRunnerPath;
+  }
+  const siblingCompiledRunnerPath = resolve(moduleDir, "workspace-git-checkpoint-runner.js");
+  if (existsSync(siblingCompiledRunnerPath)) {
+    return siblingCompiledRunnerPath;
+  }
+  return resolve(appRoot, "dist/agent_core/tui-input/workspace-git-checkpoint-runner.js");
+}
+
 export async function restoreWorkspaceGitCheckpointInSubprocess(
   params: RestoreWorkspaceGitCheckpointInSubprocessParams,
 ): Promise<WorkspaceGitCheckpointRestoreResult> {
-  const tsxCliPath = require.resolve("tsx/cli");
-  const sourceRunnerPath = [
-    resolve(params.appRoot, "src/agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
-    resolve(params.appRoot, "legacy-src/agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
-    resolve(params.appRoot, "agent_core/tui-input/workspace-git-checkpoint-runner.ts"),
-  ].find((candidate) => existsSync(candidate));
-  const distRunnerPath = resolve(params.appRoot, "dist/agent_core/tui-input/workspace-git-checkpoint-runner.js");
+  const runnerPath = resolveWorkspaceGitCheckpointRunnerPath(params.appRoot);
+  const tsxLoader = resolveTsxLoader(dirname(runnerPath));
   const command = process.execPath;
-  const args = sourceRunnerPath ? [tsxCliPath, sourceRunnerPath] : [distRunnerPath];
+  const args = runnerPath.endsWith(".ts") || runnerPath.endsWith(".tsx")
+    ? ["--import", tsxLoader ?? "tsx", runnerPath]
+    : [runnerPath];
 
   return await new Promise<WorkspaceGitCheckpointRestoreResult>((resolveResult, reject) => {
     const child = spawn(command, args, {

@@ -2,7 +2,7 @@ import { execFile as execFileCallback, spawn, type ChildProcessWithoutNullStream
 import { existsSync, readFileSync, statSync, writeSync } from "node:fs";
 import { mkdir, open, rename, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { extname, resolve } from "node:path";
+import { dirname, extname, resolve } from "node:path";
 import { Box, Text, useInput, type Instance as InkInstance } from "ink";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import stringWidth from "string-width";
@@ -319,6 +319,21 @@ import {
 import { renderFastInk as render } from "./tui-input/fast-ink-render.js";
 
 const execFile = promisify(execFileCallback);
+
+function resolveTsxLoader(startDir: string): string | null {
+  let current = resolve(startDir);
+  while (true) {
+    const candidate = resolve(current, "node_modules/tsx/dist/loader.mjs");
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+    const parent = dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
 
 type BackendStatus = "starting" | "ready" | "exited" | "failed";
 
@@ -11444,6 +11459,7 @@ function PraxisDirectTuiApp(): JSX.Element {
     const distBackendPath = useDistApplicationBackend
       ? distApplicationBackendPath
       : resolve(appRoot, "dist/raxode-cli/frontend/legacy-src/agent_core/live-agent-chat.js");
+    const tsxLoader = useSourceApplicationBackend ? resolveTsxLoader(appRoot) : null;
     const configRoot = resolveConfigRoot(appRoot);
     const stateRoot = resolveStateRoot(appRoot);
     const launchWorkspace = backendLaunchWorkspaceRef.current ?? currentCwd;
@@ -11461,7 +11477,7 @@ function PraxisDirectTuiApp(): JSX.Element {
       ? process.execPath
       : (existsSync(sourceBackendPath) ? tsxBin : process.execPath);
     const backendArgs = useSourceApplicationBackend
-      ? ["--import", "tsx", sourceBackendPath, "--ui=direct"]
+      ? ["--import", tsxLoader ?? "tsx", sourceBackendPath, "--ui=direct"]
       : existsSync(sourceBackendPath)
       ? [sourceBackendPath, "--ui=direct"]
       : [distBackendPath, "--ui=direct"];
