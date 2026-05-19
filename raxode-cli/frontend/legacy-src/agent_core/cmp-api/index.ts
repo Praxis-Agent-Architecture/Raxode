@@ -1,0 +1,325 @@
+import type {
+  CmpFiveAgentCapabilityAccessResolution,
+  CmpFiveAgentSummary,
+  CmpFiveAgentRuntimeSnapshot,
+  CmpPeerExchangeApprovalRecord,
+  CmpFiveAgentRole,
+  CmpIcmaIngestInput,
+  CmpIcmaLiveOptions,
+  CmpIteratorAdvanceInput,
+  CmpIteratorLiveOptions,
+  CmpCheckerEvaluateInput,
+  CmpCheckerLiveOptions,
+  CmpDbAgentMaterializeInput,
+  CmpDbAgentMaterializeLiveOptions,
+  CmpDbAgentPassiveInput,
+  CmpDbAgentPassiveLiveOptions,
+  CmpDispatcherDispatchInput,
+  CmpDispatcherLiveOptions,
+  CmpDispatcherPassiveReturnInput,
+  CmpDispatcherPassiveLiveOptions,
+  CmpFiveAgentActiveLiveRunInput,
+  CmpFiveAgentPassiveLiveRunInput,
+  CmpFiveAgentTapBridgeContext,
+} from "../cmp-five-agent/index.js";
+import type { CoreCmpWorksitePackageV1 } from "../core-prompt/types.js";
+import type {
+  CmpStoredSection,
+  CommitContextDeltaInput,
+  CommitContextDeltaResult,
+  DispatchContextPackageInput,
+  DispatchContextPackageResult,
+  IngestRuntimeContextInput,
+  IngestRuntimeContextResult,
+  MaterializeContextPackageInput,
+  MaterializeContextPackageResult,
+  RequestHistoricalContextInput,
+  RequestHistoricalContextResult,
+  ResolveCheckedSnapshotInput,
+  ResolveCheckedSnapshotResult,
+} from "../cmp-types/index.js";
+import type {
+  MpMemoryConfidenceLevel,
+  MpMemoryKind,
+  MpScopeDescriptor,
+} from "../mp-types/index.js";
+import type {
+  BootstrapCmpProjectInfraInput,
+  CmpRuntimeDeliveryTruthSummary,
+  DispatchCmpFiveAgentCapabilityResult,
+  CmpRuntimeProjectRecoverySummary,
+  CmpRuntimeRecoverySummary,
+} from "../runtime.js";
+import type { CmpRuntimeInfraProjectState } from "../cmp-runtime/infra-state.js";
+import type { CmpRuntimeSnapshot } from "../cmp-runtime/runtime-snapshot.js";
+import type { CmpProjectInfraBootstrapReceipt } from "../cmp-runtime/infra-bootstrap.js";
+import type {
+  AccessRequestScope,
+  TaCapabilityTier,
+  TaPoolMode,
+} from "../ta-pool-types/index.js";
+import type { IntentPriority } from "../types/index.js";
+
+export interface AdvanceCmpMqDeliveryTimeoutsInput {
+  projectId?: string;
+  now?: string;
+}
+
+export interface AdvanceCmpMqDeliveryTimeoutsResult {
+  projectId?: string;
+  processedCount: number;
+  retryScheduledCount: number;
+  expiredCount: number;
+}
+
+export interface ResolveCmpFiveAgentCapabilityAccessInput {
+  role: CmpFiveAgentRole;
+  sessionId: string;
+  runId: string;
+  agentId: string;
+  capabilityKey: string;
+  reason: string;
+  requestedTier?: TaCapabilityTier;
+  mode?: TaPoolMode;
+  taskContext?: Record<string, unknown>;
+  requestedScope?: AccessRequestScope;
+  requestedDurationMs?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface DispatchCmpFiveAgentCapabilityInput
+  extends ResolveCmpFiveAgentCapabilityAccessInput {
+  capabilityInput: Record<string, unknown>;
+  priority?: IntentPriority;
+  timeoutMs?: number;
+  cmpContext?: CmpFiveAgentTapBridgeContext;
+}
+
+export interface ReviewCmpPeerExchangeApprovalInput {
+  approvalId: string;
+  actorAgentId: string;
+  decision: "approved" | "rejected";
+  note?: string;
+}
+
+export interface AgentCoreCmpWorksiteTurnArtifactInput {
+  sessionId: string;
+  turnIndex: number;
+  currentObjective: string;
+  observedAt?: string;
+  cmp: {
+    syncStatus: "skipped" | "warming" | "ingested" | "checked" | "materialized" | "synced" | "failed";
+    agentId: string;
+    packageId: string;
+    packageRef: string;
+    packageKind?: string;
+    packageMode?: string;
+    fidelityLabel?: string;
+    projectionId: string;
+    snapshotId: string;
+    intent: string;
+    operatorGuide: string;
+    childGuide: string;
+    checkerReason: string;
+    routeRationale: string;
+    scopePolicy: string;
+    packageStrategy: string;
+    timelineStrategy: string;
+    failureReason?: string;
+  };
+}
+
+export interface AgentCoreCmpWorksiteState {
+  sessionId: string;
+  agentId: string;
+  activeTurnIndex: number;
+  currentObjective: string;
+  updatedAt: string;
+  deliveryStatus: "available" | "partial" | "absent" | "pending" | "skipped";
+  packageId?: string;
+  packageRef?: string;
+  packageMode?: string;
+  snapshotId?: string;
+}
+
+export interface AgentCoreCmpTapReviewApertureV1 {
+  schemaVersion: "cmp-tap-review-aperture/v1";
+  sessionId: string;
+  agentId: string;
+  currentObjective?: string;
+  requestedCapabilityKey?: string;
+  packageRef?: string;
+  packageFamilyId?: string;
+  snapshotId?: string;
+  checkerReason?: string;
+  routeRationale?: string;
+  routeStateSummary?: string;
+  reviewStateSummary?: string;
+  unresolvedStateSummary?: string;
+  sourceAnchorRefs?: string[];
+  pendingPeerApprovalCount?: number;
+  parentPromoteReviewCount?: number;
+  reinterventionPendingCount?: number;
+}
+
+export interface AgentCoreCmpMpCandidateV1 {
+  storedSection: CmpStoredSection;
+  checkedSnapshotRef: string;
+  branchRef: string;
+  scope: MpScopeDescriptor;
+  confidence: MpMemoryConfidenceLevel;
+  observedAt?: string;
+  capturedAt?: string;
+  sourceRefs?: string[];
+  memoryKind?: MpMemoryKind;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AgentCoreCmpMpCandidateExportV1 {
+  schemaVersion: "cmp-mp-candidate-export/v1";
+  sessionId: string;
+  agentId: string;
+  currentObjective?: string;
+  packageRef?: string;
+  packageFamilyId?: string;
+  snapshotId?: string;
+  routeRationale?: string;
+  scopePolicy?: string;
+  routeStateSummary?: string;
+  reviewStateSummary?: string;
+  unresolvedStateSummary?: string;
+  packageFamilySummary?: string;
+  activeLineSummary?: string;
+  orchestrationSummary?: string;
+  timelineSummary?: string;
+  candidateExportSummary?: string;
+  sourceAnchorRefs?: string[];
+  candidates: AgentCoreCmpMpCandidateV1[];
+}
+
+export interface AgentCoreCmpProjectApi {
+  bootstrapProjectInfra(
+    input: BootstrapCmpProjectInfraInput,
+  ): Promise<CmpProjectInfraBootstrapReceipt> | CmpProjectInfraBootstrapReceipt;
+  getBootstrapReceipt(projectId: string): CmpProjectInfraBootstrapReceipt | undefined;
+  getInfraProjectState(projectId: string): CmpRuntimeInfraProjectState | undefined;
+  getRecoverySummary(): CmpRuntimeRecoverySummary;
+  getProjectRecoverySummary(projectId: string): CmpRuntimeProjectRecoverySummary | undefined;
+  getDeliveryTruthSummary(projectId: string): CmpRuntimeDeliveryTruthSummary;
+  createSnapshot(): CmpRuntimeSnapshot;
+  recoverSnapshot(snapshot: CmpRuntimeSnapshot): Promise<void> | void;
+  advanceDeliveryTimeouts(
+    input?: AdvanceCmpMqDeliveryTimeoutsInput,
+  ): AdvanceCmpMqDeliveryTimeoutsResult;
+}
+
+export interface AgentCoreCmpWorkflowApi {
+  ingest(
+    input: IngestRuntimeContextInput,
+  ): Promise<IngestRuntimeContextResult> | IngestRuntimeContextResult;
+  commit(
+    input: CommitContextDeltaInput,
+  ): Promise<CommitContextDeltaResult> | CommitContextDeltaResult;
+  resolve(
+    input: ResolveCheckedSnapshotInput,
+  ): Promise<ResolveCheckedSnapshotResult> | ResolveCheckedSnapshotResult;
+  materialize(
+    input: MaterializeContextPackageInput,
+  ): Promise<MaterializeContextPackageResult> | MaterializeContextPackageResult;
+  dispatch(
+    input: DispatchContextPackageInput,
+  ): Promise<DispatchContextPackageResult> | DispatchContextPackageResult;
+  requestHistory(
+    input: RequestHistoricalContextInput,
+  ): Promise<RequestHistoricalContextResult> | RequestHistoricalContextResult;
+}
+
+export interface AgentCoreCmpFiveAgentApi {
+  getSummary(agentId?: string): CmpFiveAgentSummary;
+  getSnapshot(agentId?: string): CmpFiveAgentRuntimeSnapshot;
+  captureIcmaWithLlm(
+    input: CmpIcmaIngestInput,
+    options?: CmpIcmaLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["captureCmpIcmaWithLlm"]>>>;
+  advanceIteratorWithLlm(
+    input: CmpIteratorAdvanceInput,
+    options?: CmpIteratorLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["advanceCmpIteratorWithLlm"]>>>;
+  evaluateCheckerWithLlm(
+    input: CmpCheckerEvaluateInput,
+    options?: CmpCheckerLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["evaluateCmpCheckerWithLlm"]>>>;
+  materializeDbAgentWithLlm(
+    input: CmpDbAgentMaterializeInput,
+    options?: CmpDbAgentMaterializeLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["materializeCmpDbAgentWithLlm"]>>>;
+  servePassiveDbAgentWithLlm(
+    input: CmpDbAgentPassiveInput,
+    options?: CmpDbAgentPassiveLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["servePassiveCmpDbAgentWithLlm"]>>>;
+  dispatchDispatcherWithLlm(
+    input: CmpDispatcherDispatchInput,
+    options?: CmpDispatcherLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["dispatchCmpDispatcherWithLlm"]>>>;
+  deliverPassiveDispatcherWithLlm(
+    input: CmpDispatcherPassiveReturnInput,
+    options?: CmpDispatcherPassiveLiveOptions,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["deliverPassiveCmpDispatcherWithLlm"]>>>;
+  runActiveLoopWithLlm(
+    input: CmpFiveAgentActiveLiveRunInput,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["runCmpFiveAgentActiveLiveLoop"]>>>;
+  runPassiveLoopWithLlm(
+    input: CmpFiveAgentPassiveLiveRunInput,
+  ): Promise<Awaited<ReturnType<import("../runtime.js").AgentCoreRuntime["runCmpFiveAgentPassiveLiveLoop"]>>>;
+}
+
+export interface AgentCoreCmpTapBridgeApi {
+  resolveCapabilityAccess(
+    input: ResolveCmpFiveAgentCapabilityAccessInput,
+  ): Promise<CmpFiveAgentCapabilityAccessResolution> | CmpFiveAgentCapabilityAccessResolution;
+  dispatchCapability(
+    input: DispatchCmpFiveAgentCapabilityInput,
+  ): Promise<DispatchCmpFiveAgentCapabilityResult> | DispatchCmpFiveAgentCapabilityResult;
+  reviewPeerExchangeApproval(
+    input: ReviewCmpPeerExchangeApprovalInput,
+  ): Promise<CmpPeerExchangeApprovalRecord> | CmpPeerExchangeApprovalRecord;
+}
+
+export interface AgentCoreCmpWorksiteApi {
+  observeTurn(
+    input: AgentCoreCmpWorksiteTurnArtifactInput,
+  ): AgentCoreCmpWorksiteState;
+  getCurrent(input: {
+    sessionId: string;
+    agentId?: string;
+  }): AgentCoreCmpWorksiteState | undefined;
+  clearSession(input: {
+    sessionId: string;
+    agentId?: string;
+  }): void;
+  exportCorePackage(input: {
+    sessionId: string;
+    agentId?: string;
+    currentObjective?: string;
+  }): CoreCmpWorksitePackageV1;
+  exportTapPackage(input: {
+    sessionId: string;
+    agentId?: string;
+    currentObjective?: string;
+    requestedCapabilityKey?: string;
+  }): AgentCoreCmpTapReviewApertureV1 | undefined;
+  exportMpCandidates(input: {
+    sessionId: string;
+    agentId?: string;
+    currentObjective?: string;
+    limit?: number;
+  }): AgentCoreCmpMpCandidateExportV1;
+}
+
+export interface AgentCoreCmpApi {
+  readonly project: AgentCoreCmpProjectApi;
+  readonly workflow: AgentCoreCmpWorkflowApi;
+  readonly fiveAgent: AgentCoreCmpFiveAgentApi;
+  readonly tapBridge: AgentCoreCmpTapBridgeApi;
+  readonly worksite: AgentCoreCmpWorksiteApi;
+}

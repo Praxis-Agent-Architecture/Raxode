@@ -1,0 +1,90 @@
+{
+  "sessionId": "cache.probe.1778408241694",
+  "samples": [
+    {
+      "elapsedMs": 4647,
+      "usage": {
+        "input_tokens": 22174,
+        "input_tokens_details": {
+          "cached_tokens": 22016
+        },
+        "output_tokens": 19,
+        "output_tokens_details": {
+          "reasoning_tokens": 9
+        },
+        "total_tokens": 22193
+      },
+      "inputTokens": 22174,
+      "cachedTokens": 22016,
+      "cacheRate": 0.9928745377469108
+    },
+    {
+      "elapsedMs": 4494,
+      "usage": {
+        "input_tokens": 22174,
+        "input_tokens_details": {
+          "cached_tokens": 22016
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 27
+        },
+        "total_tokens": 22211
+      },
+      "inputTokens": 22174,
+      "cachedTokens": 22016,
+      "cacheRate": 0.9928745377469108
+    },
+    {
+      "elapsedMs": 3388,
+      "usage": {
+        "input_tokens": 22174,
+        "input_tokens_details": {
+          "cached_tokens": 22016
+        },
+        "output_tokens": 8,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 22182
+      },
+      "inputTokens": 22174,
+      "cachedTokens": 22016,
+      "cacheRate": 0.9928745377469108
+    },
+    {
+      "elapsedMs": 4709,
+      "usage": {
+        "input_tokens": 22174,
+        "input_tokens_details": {
+          "cached_tokens": 22016
+        },
+        "output_tokens": 19,
+        "output_tokens_details": {
+          "reasoning_tokens": 9
+        },
+        "total_tokens": 22193
+      },
+      "inputTokens": 22174,
+      "cachedTokens": 22016,
+      "cacheRate": 0.9928745377469108
+    },
+    {
+      "elapsedMs": 5638,
+      "usage": {
+        "input_tokens": 22174,
+        "input_tokens_details": {
+          "cached_tokens": 22016
+        },
+        "output_tokens": 19,
+        "output_tokens_details": {
+          "reasoning_tokens": 9
+        },
+        "total_tokens": 22193
+      },
+      "inputTokens": 22174,
+      "cachedTokens": 22016,
+      "cacheRate": 0.9928745377469108
+    }
+  ]
+}
