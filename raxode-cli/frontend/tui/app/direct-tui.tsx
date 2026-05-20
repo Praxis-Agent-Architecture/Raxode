@@ -3,7 +3,7 @@ import { existsSync, readFileSync, statSync, writeSync } from "node:fs";
 import { mkdir, open, rename, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, extname, resolve } from "node:path";
-import { Box, Text, useInput, type Instance as InkInstance } from "ink";
+import { Box, Text, useInput, type Instance as InkInstance } from "../runtime/ink/index.js";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import stringWidth from "string-width";
 import { promisify } from "node:util";
@@ -316,7 +316,7 @@ import {
   readWorkspaceRaxodeGitReadback,
   upsertWorkspaceRaxodeAgent,
 } from "../input/workspace-raxode-store.js";
-import { renderFastInk as render } from "../input/fast-ink-render.js";
+import { renderRaxodeInk as render } from "../input/raxode-ink-render.js";
 
 const execFile = promisify(execFileCallback);
 
@@ -7888,7 +7888,7 @@ const TranscriptPane = memo(function TranscriptPane({
   viewportLineCount: number;
   transientStatusLine: RenderLine | null;
   textSelection: TextSelectionState | null;
-}): JSX.Element {
+}): React.ReactElement {
   const reservedStatusLines = transientStatusLine ? 1 : 0;
   const bodyViewportLineCount = Math.max(0, viewportLineCount - reservedStatusLines);
   const bodyLines = visibleLines.slice(0, bodyViewportLineCount);
@@ -7933,7 +7933,7 @@ const TranscriptLineView = memo(function TranscriptLineView({
   line: RenderLine;
   row: number;
   textSelection: TextSelectionState | null;
-}): JSX.Element {
+}): React.ReactElement {
   const renderedSegments = applyTextSelectionToRenderSegments({
     text: line.text,
     segments: line.segments,
@@ -7977,9 +7977,9 @@ const RewindOverlayPane = memo(function RewindOverlayPane({
   selectedModeIndex: number;
   stage: "turn" | "mode";
   notice: SlashPanelNotice | null;
-}): JSX.Element {
+}): React.ReactElement {
   const selectedTurn = options[selectedTurnIndex];
-  const lines: JSX.Element[] = [];
+  const lines: React.ReactElement[] = [];
   lines.push(
     <Text key="rewind:title">
       <Text color={TUI_THEME.violet}>Rewind</Text>
@@ -8075,7 +8075,7 @@ const ExitSummaryPane = memo(function ExitSummaryPane({
   lines,
 }: {
   lines: string[];
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <Box marginTop={1} flexDirection="column">
       {lines.map((line, index) => (
@@ -8157,7 +8157,7 @@ const ComposerPane = memo(function ComposerPane({
   footerModeColor: string;
   footerModeHint: string;
   textSelection: TextSelectionState | null;
-}): JSX.Element {
+}): React.ReactElement {
   const maxLabelWidth = commandPaletteItems.reduce((max, item) => Math.max(max, item.label.length), 0);
   const panelLabelWidth = slashPanel
     ? slashPanel.fields.reduce((max, field) => Math.max(max, field.label.length), 0)
@@ -8476,7 +8476,7 @@ const ComposerPane = memo(function ComposerPane({
   );
 });
 
-function PraxisDirectTuiApp(): JSX.Element {
+function PraxisDirectTuiApp(): React.ReactElement {
   const appRoot = useMemo(() => resolveAppRoot(process.cwd()), []);
   const initialBootState = useMemo(() => resolveInitialDirectTuiBootState(), []);
   const [configRevision, setConfigRevision] = useState(0);
