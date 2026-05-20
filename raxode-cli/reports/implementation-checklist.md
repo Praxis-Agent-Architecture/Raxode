@@ -135,7 +135,7 @@
 - [x] Wire mouse scroll into slash panel line scrolling.
 - [ ] Preserve full mouse support if dependency readiness allows it.
 - [x] Preserve 120Hz input responsiveness target at text-input core level.
-- [x] Continue using the `fast-ink-render` approach.
+- [x] Replace the legacy deep-import render patch with the Raxode Ink 7 runtime renderer.
 - [x] Separate UI components from backend/runtime state.
 - [x] Separate input controller from application transport.
 - [x] Separate slash command UI from slash command execution.

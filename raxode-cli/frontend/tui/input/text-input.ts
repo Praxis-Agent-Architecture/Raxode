@@ -1,4 +1,4 @@
-import type { Key } from "ink";
+import type { Key } from "../runtime/ink/index.js";
 
 export interface TuiTextInputState {
   value: string;

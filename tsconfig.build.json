@@ -7,6 +7,7 @@
     "noEmit": false,
     "outDir": "dist",
     "rootDir": ".",
+    "removeComments": true,
     "sourceMap": false
   },
   "include": ["raxode-cli/**/*.ts", "raxode-cli/**/*.tsx"],

@@ -1,4 +1,4 @@
-import { Box, render, Text, useApp, useInput, type Key } from "ink";
+import { Box, render, Text, useApp, useInput, type Key } from "../runtime/ink/index.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import stringWidth from "string-width";
 
