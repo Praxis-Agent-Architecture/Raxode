@@ -261,12 +261,12 @@ function normalizeBaseURL(value: string | undefined): string | undefined {
   return trimmed?.replace(/\/+$/u, "");
 }
 
-function legacyCodexEnvRequested(): boolean {
+function codexEnvCompatibilityRequested(): boolean {
   return hasText(process.env.AGENTCORE_CODEX_MODEL) || hasText(process.env.AGENTCORE_CODEX_REASONING_EFFORT);
 }
 
-function shouldUseLegacyCodexEnv(options: { forceCodexLegacy?: boolean }): boolean {
-  return options.forceCodexLegacy === true && legacyCodexEnvRequested();
+function shouldUseCodexEnvCompatibility(options: { forceCodexEnvCompatibility?: boolean }): boolean {
+  return options.forceCodexEnvCompatibility === true && codexEnvCompatibilityRequested();
 }
 
 function roleIdForManifest(manifest: AgentManifest): RaxodeRoleId {
@@ -324,12 +324,12 @@ function defaultBaseURLForRoute(route: RaxodeProviderRoute): string {
 export function resolveRaxodeConfiguredModelOptions(options: {
   roleId?: RaxodeRoleId;
   startDir?: string;
-  forceCodexLegacy?: boolean;
+  forceCodexEnvCompatibility?: boolean;
 } = {}): RaxodeConfiguredModelOptions {
   const roleId = options.roleId ?? "core.main";
   const resolved = loadResolvedRoleConfig(roleId, options.startDir);
   const providerRoute = providerRouteForResolvedConfig(resolved);
-  if (shouldUseLegacyCodexEnv(options)) {
+  if (shouldUseCodexEnvCompatibility(options)) {
     return {
       provider: "openai",
       model: cleanText(process.env.AGENTCORE_CODEX_MODEL) ?? "gpt-5.5",
@@ -877,7 +877,7 @@ export function createRaxodeLiveProvider(manifest: AgentManifest, options: {
   codexAuthPath?: string;
   startDir?: string;
   roleId?: RaxodeRoleId;
-  forceCodexLegacy?: boolean;
+  forceCodexEnvCompatibility?: boolean;
   transport?: ProviderTransport;
   timeoutMs?: number;
   sessionId?: string;
@@ -891,7 +891,7 @@ export function createRaxodeLiveProvider(manifest: AgentManifest, options: {
   const configured = resolveRaxodeConfiguredModelOptions({
     roleId,
     startDir: options.startDir,
-    forceCodexLegacy: options.forceCodexLegacy,
+    forceCodexEnvCompatibility: options.forceCodexEnvCompatibility,
   });
   const providerRoute = providerRouteFromManifest(manifest) ?? configured.providerRoute;
   const resolvedConfig = resolvedConfigForRoute({

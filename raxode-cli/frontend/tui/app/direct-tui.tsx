@@ -11383,8 +11383,8 @@ function PraxisDirectTuiApp(): JSX.Element {
 
   useEffect(() => {
     const tsxLoader = resolveTsxLoader(appRoot);
-    const sourceApplicationBackendPath = resolve(appRoot, "raxode-cli/backend/legacyDirectApplicationBackend.ts");
-    const distApplicationBackendPath = resolve(appRoot, "dist/raxode-cli/backend/legacyDirectApplicationBackend.js");
+    const sourceApplicationBackendPath = resolve(appRoot, "raxode-cli/backend/raxodeTuiApplicationBackend.ts");
+    const distApplicationBackendPath = resolve(appRoot, "dist/raxode-cli/backend/raxodeTuiApplicationBackend.js");
     const useSourceApplicationBackend = existsSync(sourceApplicationBackendPath);
     const useDistApplicationBackend = !useSourceApplicationBackend && existsSync(distApplicationBackendPath);
     const configRoot = resolveConfigRoot(appRoot);

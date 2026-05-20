@@ -463,7 +463,7 @@ test("raxode live provider does not override ChatGPT Codex request path", async 
   });
 });
 
-test("raxode configured model options only use legacy Codex env when explicitly forced", async () => {
+test("raxode configured model options only use Codex env compatibility when explicitly forced", async () => {
   const previousModel = process.env.AGENTCORE_CODEX_MODEL;
   const previousReasoning = process.env.AGENTCORE_CODEX_REASONING_EFFORT;
   process.env.AGENTCORE_CODEX_MODEL = "gpt-5.5";
@@ -484,7 +484,7 @@ test("raxode configured model options only use legacy Codex env when explicitly 
     assert.equal(configResolved.providerRoute, "openai_chat_completions");
     assert.equal(configResolved.authSource, "raxode-config");
 
-    const resolved = resolveRaxodeConfiguredModelOptions({ roleId: "core.main", startDir: home, forceCodexLegacy: true });
+    const resolved = resolveRaxodeConfiguredModelOptions({ roleId: "core.main", startDir: home, forceCodexEnvCompatibility: true });
 
     assert.equal(resolved.provider, "openai");
     assert.equal(resolved.model, "gpt-5.5");
@@ -504,7 +504,7 @@ test("raxode configured model options only use legacy Codex env when explicitly 
   }
 });
 
-test("raxode configured model options do not let matching legacy Codex env hijack chat completions config", async () => {
+test("raxode configured model options do not let matching Codex env compatibility hijack chat completions config", async () => {
   const previousModel = process.env.AGENTCORE_CODEX_MODEL;
   const previousReasoning = process.env.AGENTCORE_CODEX_REASONING_EFFORT;
   process.env.AGENTCORE_CODEX_MODEL = "deepseek-v4-pro";
@@ -541,7 +541,7 @@ test("raxode configured model options do not let matching legacy Codex env hijac
   }
 });
 
-test("raxode configured model options ignore reasoning-only legacy Codex env for non-Codex routes", async () => {
+test("raxode configured model options ignore reasoning-only Codex env compatibility for non-Codex routes", async () => {
   const previousModel = process.env.AGENTCORE_CODEX_MODEL;
   const previousReasoning = process.env.AGENTCORE_CODEX_REASONING_EFFORT;
   delete process.env.AGENTCORE_CODEX_MODEL;

@@ -62,7 +62,7 @@ test("loadRaxodeLiveChatModelPlan resolves the active core and tui role plans fr
   delete process.env.RAXODE_HOME;
 });
 
-test("loadRaxodeConfigFile migrates legacy default core model to gpt-5.5 low", async () => {
+test("loadRaxodeConfigFile migrates previous default core model to gpt-5.5 low", async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), "praxis-raxode-migrate-"));
   process.env.RAXODE_HOME = path.join(rootDir, ".raxode");
   ensureRaxodeHomeScaffold(rootDir);
@@ -113,7 +113,7 @@ test("loadResolvedProviderSlotConfig binds provider profile and auth profile thr
   delete process.env.RAXODE_HOME;
 });
 
-test("loadRaxodePermissionsConfig reads persistent capability overrides without legacy matrix generation", async () => {
+test("loadRaxodePermissionsConfig reads persistent capability overrides without compatibility matrix generation", async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), "praxis-raxode-permissions-"));
   process.env.RAXODE_HOME = path.join(rootDir, ".raxode");
   ensureRaxodeHomeScaffold(rootDir);

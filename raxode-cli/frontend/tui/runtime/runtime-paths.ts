@@ -61,7 +61,7 @@ export function resolveConfigJsonPath(fallbackDir = process.cwd()): string {
   return resolve(resolveConfigRoot(fallbackDir), "config.json");
 }
 
-export function resolveLegacyLiveEnvPath(startDir = process.cwd()): string {
+export function resolveRaxodeLiveEnvPath(startDir = process.cwd()): string {
   let current = resolve(startDir);
 
   while (true) {
@@ -83,7 +83,7 @@ export function resolveLiveEnvPath(startDir = process.cwd()): string {
   if (process.env.PRAXIS_LIVE_ENV_FILE || existsSync(configuredPath)) {
     return configuredPath;
   }
-  return resolveLegacyLiveEnvPath(resolveAppRoot(startDir));
+  return resolveRaxodeLiveEnvPath(resolveAppRoot(startDir));
 }
 
 export function resolveLiveReportsDir(fallbackDir = process.cwd()): string {

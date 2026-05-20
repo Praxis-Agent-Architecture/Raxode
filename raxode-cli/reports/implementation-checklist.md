@@ -8,10 +8,10 @@
 - [x] Use `application.raxode.coding` as application id.
 - [x] Use `agent.raxode.coding` as primary agent id.
 - [x] Remove or replace the current temporary `raxode-cli/backend/agentCoreBackend.ts`; do not keep it as the final backend.
-- [x] Keep `raxode-cli/frontend/legacy-src` as the source-of-truth UI reference during migration; do not delete it.
-- [x] Perform technical separation of the old TUI, not a visual rewrite.
+- [x] Keep `raxode-cli/frontend/tui` as the source-of-truth UI reference during current organization; do not delete it.
+- [x] Perform technical separation of the current Raxode TUI, not a visual rewrite.
 - [x] Preserve the current TUI look and core behavior as the acceptance baseline.
-- [x] Reuse the existing legacy TUI as the active acceptance path; do not replace it with a newly invented shell while the legacy UI is being connected.
+- [x] Reuse the existing Raxode TUI as the active acceptance path; do not replace it with a newly invented shell while the Raxode UI is being connected.
 
 ## 1. Framework Application Layer
 
@@ -81,8 +81,8 @@
 ## 3. Application Protocol Between TUI And Backend
 
 - [x] Let applicationLayer own the canonical protocol shape.
-- [x] Replace old `direct_user_input`, `direct_init_request`, and `direct_question_answer` with the new application protocol on the new bridge path.
-- [x] Preserve legacy direct protocol at the old TUI boundary only, translating it through `raxode-cli/backend/legacyDirectApplicationBackend.ts` into applicationLayer turns.
+- [x] Replace direct TUI `direct_user_input`, `direct_init_request`, and `direct_question_answer` with the new application protocol on the new bridge path.
+- [x] Preserve Raxode TUI protocol at the current Raxode TUI boundary only, translating it through `raxode-cli/backend/raxodeTuiApplicationBackend.ts` into applicationLayer turns.
 - [x] Use JSON envelopes for TUI input.
 - [x] Use application events for backend output.
 - [x] Include event kinds for lifecycle, conversation, tool, approval, model, permission, workspace, stdout, stderr, error, and final answer.
@@ -101,14 +101,14 @@
 
 ## 4. TUI Technical Separation
 
-- [x] Keep `raxode-cli/frontend/legacy-src` untouched as reference material during migration.
-- [x] Keep `raxode-cli/frontend/legacy-src/agent_core/direct-tui.tsx` as a runnable legacy UI and connect it to the application backend.
-- [x] Start the legacy TUI backend through `raxode-cli/backend/legacyDirectApplicationBackend.ts` when available.
-- [x] Fix legacy adapter startup ordering so stdin is attached immediately after `direct ready` and queued until application runtime initialization completes.
-- [x] Bridge application `stream` events back into legacy `assistant_delta` live-report rows.
+- [x] Keep `raxode-cli/frontend/tui` untouched as reference material during current organization.
+- [x] Keep `raxode-cli/frontend/tui/agent_core/direct-tui.tsx` as a runnable Raxode UI and connect it to the application backend.
+- [x] Start the Raxode TUI backend through `raxode-cli/backend/raxodeTuiApplicationBackend.ts` when available.
+- [x] Fix Raxode TUI adapter startup ordering so stdin is attached immediately after `direct ready` and queued until application runtime initialization completes.
+- [x] Bridge application `stream` events back into Raxode TUI `assistant_delta` live-report rows.
 - [x] Preserve whitespace inside streamed model deltas so token chunks concatenate exactly.
-- [x] Suppress backend-only Node experimental warnings from polluting the legacy TUI transcript.
-- [x] Create a new organized frontend structure outside `legacy-src`.
+- [x] Suppress backend-only Node experimental warnings from polluting the Raxode TUI transcript.
+- [x] Create a new organized frontend structure outside `tui`.
 - [x] Keep Ink + React.
 - [x] Preserve black background, purple highlight, bottom workspace/context status bar, and slash menu table.
 - [x] Preserve the visible slash commands: `/model`, `/status`, `/exit`, `/init`, `/resume`, `/permissions`, `/workspace`.
@@ -118,7 +118,7 @@
 - [x] Preserve clipboard file path/URI paste attachment path.
 - [x] Preserve full desktop file paste behavior with provider-specific MIME metadata.
 - [x] Preserve `@file` references.
-- [x] Preserve workspace index/search core outside `legacy-src`.
+- [x] Preserve workspace index/search core outside `tui`.
 - [x] Preserve workspace indexed relative switch command path.
 - [x] Preserve full interactive workspace picker behavior.
 - [x] Preserve session switch command path.
@@ -140,9 +140,9 @@
 - [x] Separate input controller from application transport.
 - [x] Separate slash command UI from slash command execution.
 - [x] Separate panels from application event decoding.
-- [x] Remove old backend coupling from migrated frontend code.
+- [x] Remove direct backend coupling from current frontend code.
 - [x] Add `npm run raxode:tui`.
-- [x] Keep `npm run raxode:legacy-tui`.
+- [x] Keep `npm run raxode:raxode-tui`.
 
 ## 5. Migration Phases
 
@@ -150,10 +150,10 @@
 - [x] Phase 2: Build `raxode-cli/backend` as a realtest-style complete application project.
 - [x] Phase 3: Replace temporary backend adapter with applicationLayer-backed Raxode backend.
 - [x] Phase 4: Add new application protocol and transport.
-- [x] Phase 5: Extract reusable frontend modules from `legacy-src` into organized frontend directories.
-- [x] Phase 6: Replace old backend calls in the TUI with the new application client.
-- [x] Phase 6b: Restore the existing legacy TUI as an application-backed runnable path through a compatibility adapter, preserving its current UI rather than forcing the new shell.
-- [ ] Phase 7: Preserve and verify visual parity with the old TUI.
+- [x] Phase 5: Extract reusable frontend modules from `tui` into organized frontend directories.
+- [x] Phase 6: Replace direct backend calls in the TUI with the new application client.
+- [x] Phase 6b: Restore the existing Raxode TUI as an application-backed runnable path through a compatibility adapter, preserving its current UI rather than forcing the new shell.
+- [ ] Phase 7: Preserve and verify visual parity with the current Raxode TUI.
 - [x] Add static render smoke for core visual anchors.
 - [x] Phase 8: Run dry-run backend validation.
 - [x] Phase 9: Run live `gpt-5.5-low` validation.
@@ -167,8 +167,8 @@
 - [x] Verify Raxode backend dry-run.
 - [x] Verify Raxode backend live-run.
 - [x] Verify TUI can talk to `gpt-5.5` through the new application backend.
-- [x] Verify legacy TUI can talk to the application backend through `npm run raxode:legacy-tui`.
-- [x] Verify legacy TUI streaming path emits `assistant_delta` rows at the 120fps frame target.
+- [x] Verify Raxode TUI can talk to the application backend through `npm run raxode:raxode-tui`.
+- [x] Verify Raxode TUI streaming path emits `assistant_delta` rows at the 120fps frame target.
 - [x] Verify shell tool flow.
 - [x] Verify git tool flow.
 - [x] Verify code/file tool flow.
@@ -189,11 +189,11 @@
 - [x] Verify TUI input/delete responsiveness remains near 120Hz target at text-input core level.
 - [ ] Verify full rendered TUI input/delete responsiveness in an interactive terminal.
 - [x] Verify rendered TUI accepts real TTY input, backspace correction, and `/status` panel opening through tmux smoke; see `raxode-cli/reports/tui-smoke.md`.
-- [x] Verify legacy TUI accepts real TTY input through tmux and renders application backend output; latest dry-run smoke showed `PraxisRuntimeKernel dry-run completed.` from the legacy UI.
-- [x] Verify legacy TUI stream smoke through tmux with `RAXODE_RENDER_FPS=120 RAXODE_STREAM_FPS=120`; dry-run fallback emitted five `assistant_delta` rows about 8-10ms apart.
-- [x] Verify legacy TUI live stream smoke through tmux with `gpt-5.5-low`; prompt `只回答: OK` rendered `OK` and logged a real `assistant_delta` row before `turn_result`.
-- [x] Verify core visual anchors render in migrated Shell.
-- [ ] Verify full visual parity against current legacy TUI.
+- [x] Verify Raxode TUI accepts real TTY input through tmux and renders application backend output; latest dry-run smoke showed `PraxisRuntimeKernel dry-run completed.` from the Raxode UI.
+- [x] Verify Raxode TUI stream smoke through tmux with `RAXODE_RENDER_FPS=120 RAXODE_STREAM_FPS=120`; dry-run fallback emitted five `assistant_delta` rows about 8-10ms apart.
+- [x] Verify Raxode TUI live stream smoke through tmux with `gpt-5.5-low`; prompt `只回答: OK` rendered `OK` and logged a real `assistant_delta` row before `turn_result`.
+- [x] Verify core visual anchors render in current Shell.
+- [ ] Verify full visual parity against current Raxode TUI.
 - [x] Verify non-interactive Raxode TUI render smoke through the new application backend.
 
 ## 7. Documentation And Memory
@@ -202,12 +202,12 @@
 - [x] Write important architecture decisions to project memory.
 - [x] Document `src/applicationLayer` as the official application integration surface.
 - [x] Document `raxode-cli/backend` as the first full Praxis application backend.
-- [x] Document the TUI technical split and legacy preservation policy.
+- [x] Document the TUI technical split and current TUI preservation policy.
 - [x] Document known provider/API gaps instead of hiding them.
 
 ## 8. Non-Negotiable Constraints
 
-- [x] Do not delete `raxode-cli/frontend/legacy-src`.
+- [x] Do not delete `raxode-cli/frontend/tui`.
 - [x] Do not lose current TUI visual identity.
 - [x] Do not reintroduce direct TUI-to-agentCore coupling.
 - [x] Do not handwrite 176 BaseTool wrappers.

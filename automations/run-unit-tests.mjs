@@ -9,6 +9,7 @@ const testFiles = [
   "raxode-cli/frontend/tui/config/raxode-config.test.ts",
   "raxode-cli/frontend/tui/login/raxode-login-wizard.test.ts",
   "raxode-cli/backend/tests/raxodeBackend.compile.test.ts",
+  "raxode-cli/backend/tests/raxodeTuiApplicationBackend.test.ts",
   "raxode-cli/backend/tests/raxodeApplicationRuntime.test.ts",
   "raxode-cli/backend/tests/raxodeLiveProvider.test.ts",
   "raxode-cli/frontend/bridge/applicationClient.test.ts",
