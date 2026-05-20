@@ -11,7 +11,7 @@ This file records capability gaps that must not be reported as live-proven.
 - Application WebSocket JSON transport is implemented for ready, command, command result, and event messages.
 - Full BaseTool matrix coverage is complete through `npm run test:agentCore:all-tools-matrix`; see `raxode-cli/reports/all-tools-matrix.md`. This is readiness and no-model family matrix proof, not proof that every tool performed a real external side effect through a live model turn.
 - Live shell/git/code/search/skill/computeruse/mcp paths have repeatable smoke coverage through `npm run test:raxode:live-tools`.
-- Legacy panels for model, permissions, approval, file paste, image paste, workspace search, mouse interaction, and session switching are being migrated incrementally from `legacy-src`.
+- Raxode TUI panels for model, permissions, approval, file paste, image paste, workspace search, mouse interaction, and session switching are being current incrementally from `tui`.
 
 ## Reporting Rule
 

@@ -1,6 +1,6 @@
 # Raxode TUI Smoke Evidence
 
-This report tracks migrated TUI startup and interaction evidence through the new application-layer backend.
+This report tracks current TUI startup and interaction evidence through the new application-layer backend.
 
 ## Non-TTY Guard
 

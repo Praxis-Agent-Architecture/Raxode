@@ -1,6 +1,6 @@
 /*
- * 文件定位：raxode-cli/backend legacy direct TUI adapter。
- * 核心目的：让 legacy `direct-tui.tsx` 保持原 UI/输入协议，同时接入新的 applicationLayer Raxode 后端。
+ * 文件定位：raxode-cli/backend Raxode TUI application adapter。
+ * 核心目的：让 Raxode `direct-tui.tsx` 保持原 UI/输入协议，同时接入新的 applicationLayer Raxode 后端。
  */
 
 import { mkdir, appendFile } from "node:fs/promises";
@@ -23,7 +23,7 @@ import type {
   PraxisApplicationUsageTelemetry,
 } from "@praxis-ai/praxis/application-layer";
 
-type LegacyDirectBackendOptions = {
+type RaxodeTuiBackendOptions = {
   projectRoot?: string;
   input?: NodeJS.ReadableStream;
   output?: NodeJS.WritableStream;
@@ -46,7 +46,7 @@ type DirectEnvelope = {
   answers?: Array<Record<string, unknown>>;
 };
 
-type LegacyHumanGateDecisionEnvelope = {
+type RaxodeTuiHumanGateDecisionEnvelope = {
   type: "human_gate_decision";
   gateId: string;
   action: "approve" | "approve_always" | "reject" | "reject_stop";
@@ -135,13 +135,13 @@ function normalizeDirectPayload(raw: string): {
       if (!text) return [];
       const tokenText = typeof entry.tokenText === "string" ? entry.tokenText : `[Pasted Content #${index + 1}]`;
       return [{
-        id: typeof entry.id === "string" ? entry.id : `legacy-paste:${index + 1}`,
+        id: typeof entry.id === "string" ? entry.id : `raxode-tui-paste:${index + 1}`,
         kind: "text" as const,
         tokenText,
         displayName: tokenText,
         text,
         metadata: {
-          sourceKind: "legacy-direct-tui",
+          sourceKind: "raxode-tui",
         },
       }];
     });
@@ -149,13 +149,13 @@ function normalizeDirectPayload(raw: string): {
       const localPath = typeof entry.absolutePath === "string" ? entry.absolutePath : "";
       if (!localPath) return [];
       return [{
-        id: typeof entry.id === "string" ? entry.id : `legacy-file:${index + 1}`,
+        id: typeof entry.id === "string" ? entry.id : `raxode-tui-file:${index + 1}`,
         kind: "file" as const,
         tokenText: typeof entry.tokenText === "string" ? entry.tokenText : `@${localPath}`,
         displayName: typeof entry.displayName === "string" ? entry.displayName : path.basename(localPath),
         localPath,
         metadata: {
-          sourceKind: "legacy-direct-tui",
+          sourceKind: "raxode-tui",
         },
       }];
     });
@@ -164,7 +164,7 @@ function normalizeDirectPayload(raw: string): {
       const remoteUrl = typeof entry.remoteUrl === "string" ? entry.remoteUrl : undefined;
       if (!localPath && !remoteUrl) return [];
       return [{
-        id: typeof entry.id === "string" ? entry.id : `legacy-attachment:${index + 1}`,
+        id: typeof entry.id === "string" ? entry.id : `raxode-tui-attachment:${index + 1}`,
         kind: "image" as const,
         tokenText: typeof entry.tokenText === "string" ? entry.tokenText : `[Image #${index + 1}]`,
         displayName: typeof entry.displayName === "string" ? entry.displayName : undefined,
@@ -172,7 +172,7 @@ function normalizeDirectPayload(raw: string): {
         localPath,
         remoteUrl,
         metadata: {
-          sourceKind: "legacy-direct-tui",
+          sourceKind: "raxode-tui",
         },
       }];
     });
@@ -186,7 +186,7 @@ function normalizeDirectPayload(raw: string): {
   }
 }
 
-function parseLegacyHumanGateDecision(raw: string): LegacyHumanGateDecisionEnvelope | undefined {
+function parseRaxodeTuiHumanGateDecision(raw: string): RaxodeTuiHumanGateDecisionEnvelope | undefined {
   const trimmed = raw.trim();
   if (!trimmed.startsWith("{")) return undefined;
   try {
@@ -319,7 +319,7 @@ function buildRuntimeApprovalPanelSnapshot(
 }
 
 function approvalDecisionToRuntimeResolution(input: {
-  decision: LegacyHumanGateDecisionEnvelope;
+  decision: RaxodeTuiHumanGateDecisionEnvelope;
   pending: PendingRuntimeApproval;
 }): RuntimeApprovalResolution {
   if (input.decision.action === "approve" || input.decision.action === "approve_always") {
@@ -375,7 +375,7 @@ function hasContextNumber(context: PraxisApplicationContextTelemetry | undefined
   );
 }
 
-type LegacyDirectContextSnapshot = ReturnType<typeof buildContextSnapshot>;
+type RaxodeTuiContextSnapshot = ReturnType<typeof buildContextSnapshot>;
 
 function buildContextSnapshot(result?: PraxisApplicationCommandResult) {
   const model = result?.view.model;
@@ -420,7 +420,7 @@ function buildContextSnapshot(result?: PraxisApplicationCommandResult) {
   };
 }
 
-function isProviderBackedContext(context: LegacyDirectContextSnapshot | undefined): boolean {
+function isProviderBackedContext(context: RaxodeTuiContextSnapshot | undefined): boolean {
   if (!context) {
     return false;
   }
@@ -432,7 +432,7 @@ function isProviderBackedContext(context: LegacyDirectContextSnapshot | undefine
 
 function contextFor(
   result?: PraxisApplicationCommandResult,
-  options: { lastProviderContext?: LegacyDirectContextSnapshot } = {},
+  options: { lastProviderContext?: RaxodeTuiContextSnapshot } = {},
 ) {
   const nextContext = buildContextSnapshot(result);
   const previousProviderContext = options.lastProviderContext;
@@ -481,7 +481,7 @@ function usageFor(result: PraxisApplicationCommandResult) {
   };
 }
 
-function legacyResultErrorCode(error: { code: string; message: string }): string {
+function raxodeTuiResultErrorCode(error: { code: string; message: string }): string {
   if (error.code !== "MODEL_INVOCATION_FAILED") {
     return error.code;
   }
@@ -503,7 +503,7 @@ function parseApplicationTurnIndex(turnId: string | undefined, fallback: number)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function legacyStreamFrameMs(): number {
+function raxodeTuiStreamFrameMs(): number {
   const raw = Number.parseFloat(process.env.RAXODE_STREAM_FPS ?? process.env.RAXODE_RENDER_FPS ?? "120");
   const fps = Number.isFinite(raw) && raw > 0 ? raw : 120;
   return Math.max(1, 1000 / fps);
@@ -547,7 +547,7 @@ function recordMetadata(metadata: Readonly<Record<string, unknown>> | undefined,
     : undefined;
 }
 
-function legacyToolStageRecord(input: {
+function raxodeTuiToolStageRecord(input: {
   applicationEvent: PraxisApplicationEvent;
   sessionId: string;
   turnIndex: number;
@@ -592,7 +592,7 @@ function legacyToolStageRecord(input: {
   };
 }
 
-function legacyModelStageRecord(input: {
+function raxodeTuiModelStageRecord(input: {
   applicationEvent: PraxisApplicationEvent;
   sessionId: string;
   turnIndex: number;
@@ -625,7 +625,7 @@ function legacyModelStageRecord(input: {
   };
 }
 
-function legacyToolCallPreviewRecord(input: {
+function raxodeTuiToolCallPreviewRecord(input: {
   applicationEvent: PraxisApplicationEvent;
   sessionId: string;
   turnIndex: number;
@@ -652,7 +652,7 @@ function legacyToolCallPreviewRecord(input: {
   };
 }
 
-export async function startLegacyDirectApplicationBackend(options: LegacyDirectBackendOptions = {}): Promise<void> {
+export async function startRaxodeTuiApplicationBackend(options: RaxodeTuiBackendOptions = {}): Promise<void> {
   const input = options.input ?? process.stdin;
   const output = options.output ?? process.stdout;
   const errorOutput = options.errorOutput ?? process.stderr;
@@ -665,13 +665,13 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
   );
   const reportsDir = path.resolve(options.stateRoot ?? stateRoot, "live-reports");
   await mkdir(reportsDir, { recursive: true });
-  const logPath = path.join(reportsDir, `legacy-direct-application-${sessionId.replace(/[^\w.-]+/gu, "_")}-${Date.now()}.jsonl`);
+  const logPath = path.join(reportsDir, `raxode-tui-application-${sessionId.replace(/[^\w.-]+/gu, "_")}-${Date.now()}.jsonl`);
   output.write(`log file: ${logPath}\n`);
   output.write(`direct ready: ${sessionId}\n`);
   let runtimeEventLogQueue = Promise.resolve();
   const enqueueRuntimeEventLog = (record: Record<string, unknown>) => {
     runtimeEventLogQueue = runtimeEventLogQueue.then(() => writeLog(logPath, record)).catch((error: unknown) => {
-      errorOutput.write(`legacy direct application backend runtime event log failed: ${error instanceof Error ? error.message : String(error)}\n`);
+      errorOutput.write(`Raxode TUI application backend runtime event log failed: ${error instanceof Error ? error.message : String(error)}\n`);
     });
     return runtimeEventLogQueue;
   };
@@ -687,7 +687,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
       () => options.now?.() ?? new Date().toISOString(),
     ),
   });
-  const resolveHumanGateDecisionPayload = (decision: LegacyHumanGateDecisionEnvelope): boolean => {
+  const resolveHumanGateDecisionPayload = (decision: RaxodeTuiHumanGateDecisionEnvelope): boolean => {
     const pending = pendingRuntimeApprovals.get(decision.gateId);
     if (!pending) return false;
     pendingRuntimeApprovals.delete(decision.gateId);
@@ -767,7 +767,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     }
     const handler = handlePayloadImpl;
     payloadQueue = payloadQueue.then(() => handler(rawPayload)).catch((error: unknown) => {
-      errorOutput.write(`legacy direct application backend payload failed: ${error instanceof Error ? error.message : String(error)}\n`);
+      errorOutput.write(`Raxode TUI application backend payload failed: ${error instanceof Error ? error.message : String(error)}\n`);
     });
   };
 
@@ -777,7 +777,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     const parts = buffer.split("\u0000");
     buffer = parts.pop() ?? "";
     for (const part of parts) {
-      const decision = parseLegacyHumanGateDecision(part);
+      const decision = parseRaxodeTuiHumanGateDecision(part);
       if (decision && resolveHumanGateDecisionPayload(decision)) {
         continue;
       }
@@ -801,7 +801,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
 
   const created = await applicationLayer.createApplicationProjectRuntime(options.projectRoot ?? defaultProjectRoot(), {
     applicationId: applicationModule.raxodeApplication.id,
-    mode: options.mode ?? (process.env.RAXODE_LEGACY_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
+    mode: options.mode ?? (process.env.RAXODE_TUI_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
     provider: modelOptions.provider,
     endpointShape: modelOptions.endpointShape,
     baseURL: modelOptions.baseURL,
@@ -831,60 +831,60 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
       status: "failed",
       text: created.error.message,
     });
-    errorOutput.write(`legacy direct application backend failed: ${created.error.message}\n`);
+    errorOutput.write(`Raxode TUI application backend failed: ${created.error.message}\n`);
     return;
   }
 
   const transport = applicationLayer.createLocalApplicationTransport(created.runtime);
   const streamedTextByTurn = new Map<number, string>();
-  const legacyTurnIndexByApplicationTurnId = new Map<string, number>();
+  const tuiTurnIndexByApplicationTurnId = new Map<string, number>();
   const initialTurnIndex = normalizeInitialTurnIndex(
     options.initialTurnIndex ?? process.env.PRAXIS_DIRECT_INITIAL_TURN_INDEX,
   );
   let turnIndex = initialTurnIndex;
-  let activeLegacyTurnIndex: number | undefined;
-  let lastProviderContext: LegacyDirectContextSnapshot | undefined;
+  let activeTuiTurnIndex: number | undefined;
+  let lastProviderContext: RaxodeTuiContextSnapshot | undefined;
   transport.subscribe((applicationEvent) => {
-    const legacyTurnIndex = (() => {
+    const tuiTurnIndex = (() => {
       const applicationTurnId = applicationEvent.turnId;
       if (applicationTurnId) {
-        const existing = legacyTurnIndexByApplicationTurnId.get(applicationTurnId);
+        const existing = tuiTurnIndexByApplicationTurnId.get(applicationTurnId);
         if (existing !== undefined) {
           return existing;
         }
-        if (activeLegacyTurnIndex !== undefined) {
-          legacyTurnIndexByApplicationTurnId.set(applicationTurnId, activeLegacyTurnIndex);
-          return activeLegacyTurnIndex;
+        if (activeTuiTurnIndex !== undefined) {
+          tuiTurnIndexByApplicationTurnId.set(applicationTurnId, activeTuiTurnIndex);
+          return activeTuiTurnIndex;
         }
       }
       return parseApplicationTurnIndex(applicationTurnId, turnIndex || 1);
     })();
-    const modelStageRecord = legacyModelStageRecord({
+    const modelStageRecord = raxodeTuiModelStageRecord({
       applicationEvent,
       sessionId,
-      turnIndex: legacyTurnIndex,
+      turnIndex: tuiTurnIndex,
     });
     if (modelStageRecord) {
-      const modelContext = recordMetadata(modelStageRecord, "context") as LegacyDirectContextSnapshot | undefined;
+      const modelContext = recordMetadata(modelStageRecord, "context") as RaxodeTuiContextSnapshot | undefined;
       if (isProviderBackedContext(modelContext)) {
         lastProviderContext = modelContext;
       }
       void enqueueRuntimeEventLog(modelStageRecord);
       return;
     }
-    const toolStageRecord = legacyToolStageRecord({
+    const toolStageRecord = raxodeTuiToolStageRecord({
       applicationEvent,
       sessionId,
-      turnIndex: legacyTurnIndex,
+      turnIndex: tuiTurnIndex,
     });
     if (toolStageRecord) {
       void enqueueRuntimeEventLog(toolStageRecord);
       return;
     }
-    const toolCallPreviewRecord = legacyToolCallPreviewRecord({
+    const toolCallPreviewRecord = raxodeTuiToolCallPreviewRecord({
       applicationEvent,
       sessionId,
-      turnIndex: legacyTurnIndex,
+      turnIndex: tuiTurnIndex,
     });
     if (toolCallPreviewRecord) {
       void enqueueRuntimeEventLog(toolCallPreviewRecord);
@@ -893,12 +893,12 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     if (applicationEvent.kind !== "stream" || applicationEvent.message.length === 0) {
       return;
     }
-    streamedTextByTurn.set(legacyTurnIndex, `${streamedTextByTurn.get(legacyTurnIndex) ?? ""}${applicationEvent.message}`);
+    streamedTextByTurn.set(tuiTurnIndex, `${streamedTextByTurn.get(tuiTurnIndex) ?? ""}${applicationEvent.message}`);
     void enqueueRuntimeEventLog({
       ts: applicationEvent.createdAt,
       event: "assistant_delta",
       sessionId,
-      turnIndex: legacyTurnIndex,
+      turnIndex: tuiTurnIndex,
       label: "core/model.infer",
       text: applicationEvent.message,
       done: false,
@@ -908,7 +908,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     type: "application.start",
     sessionId,
     cwd,
-    mode: options.mode ?? (process.env.RAXODE_LEGACY_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
+    mode: options.mode ?? (process.env.RAXODE_TUI_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
   });
   await writeLog(logPath, {
     ts: options.now?.() ?? new Date().toISOString(),
@@ -937,7 +937,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     }
     if (payload.startsWith("/rewind")) {
       await transport.dispatch({ type: "application.rewind", sessionId, turnIndex: Math.max(0, turnIndex - 1) });
-      legacyTurnIndexByApplicationTurnId.clear();
+      tuiTurnIndexByApplicationTurnId.clear();
       await writeLog(logPath, {
         ts: options.now?.() ?? new Date().toISOString(),
         event: "rewind_applied",
@@ -970,13 +970,13 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     });
 
     const dispatchStartedAtMs = Date.now();
-    activeLegacyTurnIndex = turnIndex;
+    activeTuiTurnIndex = turnIndex;
     const result = await (async () => {
       try {
         return await transport.dispatch({
           type: "application.submitTurn",
           sessionId,
-          mode: options.mode ?? (process.env.RAXODE_LEGACY_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
+          mode: options.mode ?? (process.env.RAXODE_TUI_APPLICATION_MODE === "dry-run" ? "dry-run" : "live"),
           input: {
             type: "application.input",
             text: normalized.text,
@@ -985,7 +985,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
           },
         });
       } finally {
-        activeLegacyTurnIndex = undefined;
+        activeTuiTurnIndex = undefined;
       }
     })();
     const dispatchElapsedMs = Math.max(0, Date.now() - dispatchStartedAtMs);
@@ -1002,7 +1002,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
           text: chunk,
           done: false,
         });
-        await waitFrame(legacyStreamFrameMs());
+        await waitFrame(raxodeTuiStreamFrameMs());
       }
     }
     const completedAt = options.now?.() ?? new Date().toISOString();
@@ -1022,7 +1022,7 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
     const resultMetadata = result.ok
       ? undefined
       : {
-          errorCode: legacyResultErrorCode(result.view.error ?? result.error),
+          errorCode: raxodeTuiResultErrorCode(result.view.error ?? result.error),
           errorMessage: result.view.error?.message ?? result.error.message,
         };
     await writeLog(logPath, {
@@ -1058,5 +1058,5 @@ export async function startLegacyDirectApplicationBackend(options: LegacyDirectB
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  await startLegacyDirectApplicationBackend();
+  await startRaxodeTuiApplicationBackend();
 }

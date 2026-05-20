@@ -6,10 +6,10 @@ import path from "node:path";
 
 function usage() {
   return [
-    "Usage: node automations/raxode-cache-xray.mjs <legacy-direct-application-log.jsonl>",
+    "Usage: node automations/raxode-cache-xray.mjs <raxode-tui-application-log.jsonl>",
     "       node automations/raxode-cache-xray.mjs --latest [--dir <live-reports-dir>] [--require-new-telemetry]",
     "",
-    "Prints cache hit, stable-prefix, dynamic-payload, tool-result-budget, and context telemetry from raxode legacy JSONL logs.",
+    "Prints cache hit, stable-prefix, dynamic-payload, tool-result-budget, and context telemetry from Raxode TUI JSONL logs.",
   ].join("\n");
 }
 

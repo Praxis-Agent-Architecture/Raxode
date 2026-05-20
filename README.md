@@ -1,6 +1,6 @@
 # Raxode
 
-Raxode is the official Praxis coding-agent product: a backend plus the legacy terminal UI built on `@praxis-ai/praxis`.
+Raxode is the official Praxis coding-agent product: a backend plus the Raxode terminal UI built on `@praxis-ai/praxis`.
 
 ## Install
 

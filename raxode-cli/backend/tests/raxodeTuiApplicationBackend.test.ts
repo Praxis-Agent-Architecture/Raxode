@@ -7,12 +7,12 @@ import { PassThrough } from "node:stream";
 import test from "node:test";
 import { promisify } from "node:util";
 
-import { startLegacyDirectApplicationBackend } from "../legacyDirectApplicationBackend.js";
+import { startRaxodeTuiApplicationBackend } from "../raxodeTuiApplicationBackend.js";
 
 const execFileAsync = promisify(execFile);
 
-test("legacy direct application backend speaks direct ready and writes ordered legacy log events", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-"));
+test("Raxode TUI application backend speaks direct ready and writes ordered Raxode TUI log events", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -27,7 +27,7 @@ test("legacy direct application backend speaks direct ready and writes ordered l
     stderr += typeof chunk === "string" ? chunk : chunk.toString("utf8");
   });
 
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,
@@ -40,7 +40,7 @@ test("legacy direct application backend speaks direct ready and writes ordered l
 
   input.write(`${JSON.stringify({
     type: "direct_user_input",
-    text: "legacy adapter smoke",
+    text: "Raxode TUI adapter smoke",
   })}\u0000/exit\u0000`);
   input.end();
   await done;
@@ -91,8 +91,8 @@ test("legacy direct application backend speaks direct ready and writes ordered l
   await rm(stateRoot, { recursive: true, force: true });
 });
 
-test("legacy direct application backend resumes turn indexes from the restored session offset", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-resume-"));
+test("Raxode TUI application backend resumes turn indexes from the restored session offset", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-resume-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -107,7 +107,7 @@ test("legacy direct application backend resumes turn indexes from the restored s
     stderr += typeof chunk === "string" ? chunk : chunk.toString("utf8");
   });
 
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,
@@ -150,8 +150,8 @@ test("legacy direct application backend resumes turn indexes from the restored s
   await rm(stateRoot, { recursive: true, force: true });
 });
 
-test("legacy direct application backend maps live stream deltas onto the resumed legacy turn", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-resume-stream-"));
+test("Raxode TUI application backend maps live stream deltas onto the resumed Raxode TUI turn", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-resume-stream-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -166,7 +166,7 @@ test("legacy direct application backend maps live stream deltas onto the resumed
     stderr += typeof chunk === "string" ? chunk : chunk.toString("utf8");
   });
 
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,
@@ -232,8 +232,8 @@ test("legacy direct application backend maps live stream deltas onto the resumed
   await rm(stateRoot, { recursive: true, force: true });
 });
 
-test("legacy direct application backend logs tool call preview events before tool execution completes", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-tool-preview-"));
+test("Raxode TUI application backend logs tool call preview events before tool execution completes", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-tool-preview-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -248,7 +248,7 @@ test("legacy direct application backend logs tool call preview events before too
     stderr += typeof chunk === "string" ? chunk : chunk.toString("utf8");
   });
 
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,
@@ -331,8 +331,8 @@ test("legacy direct application backend logs tool call preview events before too
   await rm(stateRoot, { recursive: true, force: true });
 });
 
-test("legacy direct application backend writes live codex usage from framework telemetry", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-live-"));
+test("Raxode TUI application backend writes live codex usage from framework telemetry", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-live-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -347,7 +347,7 @@ test("legacy direct application backend writes live codex usage from framework t
     stderr += typeof chunk === "string" ? chunk : chunk.toString("utf8");
   });
 
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,
@@ -546,8 +546,8 @@ test("legacy direct application backend writes live codex usage from framework t
   await rm(stateRoot, { recursive: true, force: true });
 });
 
-test("legacy direct application backend retains provider context after provider failure", async () => {
-  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-legacy-direct-provider-failure-context-"));
+test("Raxode TUI application backend retains provider context after provider failure", async () => {
+  const stateRoot = await mkdtemp(path.join(os.tmpdir(), "raxode-tui-provider-failure-context-"));
   const previousStreamFps = process.env.RAXODE_STREAM_FPS;
   process.env.RAXODE_STREAM_FPS = "1000";
   const input = new PassThrough();
@@ -563,7 +563,7 @@ test("legacy direct application backend retains provider context after provider 
   });
 
   let providerCallCount = 0;
-  const done = startLegacyDirectApplicationBackend({
+  const done = startRaxodeTuiApplicationBackend({
     input,
     output,
     errorOutput,

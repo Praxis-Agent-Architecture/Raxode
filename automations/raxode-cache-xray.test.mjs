@@ -20,7 +20,7 @@ test("raxode-cache-xray prints help without treating --help as a log path", asyn
 
 test("raxode-cache-xray explains cache shape, observed usage, comparison, and tool-result budget", async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), "raxode-cache-xray-"));
-  const logPath = path.join(dir, "legacy-direct-application-test.jsonl");
+  const logPath = path.join(dir, "raxode-tui-application-test.jsonl");
   const rows = [
     {
       event: "stage_end",
@@ -97,8 +97,8 @@ test("raxode-cache-xray explains cache shape, observed usage, comparison, and to
 });
 
 test("raxode-cache-xray can require new telemetry fields for live validation", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "raxode-cache-xray-old-"));
-  const logPath = path.join(dir, "legacy-direct-application-old.jsonl");
+  const dir = await mkdtemp(path.join(os.tmpdir(), "raxode-cache-xray-"));
+  const logPath = path.join(dir, "raxode-tui-application.jsonl");
   await writeFile(logPath, JSON.stringify({
     event: "stage_end",
     stage: "core/model.infer",
@@ -124,7 +124,7 @@ test("raxode-cache-xray can require new telemetry fields for live validation", a
 
 test("raxode-cache-xray requires adjacent comparison after the first model row", async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), "raxode-cache-xray-comparison-"));
-  const logPath = path.join(dir, "legacy-direct-application-no-comparison.jsonl");
+  const logPath = path.join(dir, "raxode-tui-application-no-comparison.jsonl");
   const cacheDebug = {
     kind: "praxis.modelCall.cacheDebug",
     promptPack: { segments: [] },
