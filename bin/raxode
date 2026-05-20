@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+PRG=$0
+while [ -h "$PRG" ]; do
+  LINK=$(ls -ld -- "$PRG")
+  LINK=$(expr "$LINK" : '.*-> \(.*\)$')
+  case "$LINK" in
+    /*) PRG=$LINK ;;
+    *) PRG=$(dirname -- "$PRG")/$LINK ;;
+  esac
+done
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$PRG")" && pwd)
+SOURCE_ENTRY="$SCRIPT_DIR/../raxode-cli/frontend/tui/cli/raxode-cli.ts"
+TSX_LOADER="$SCRIPT_DIR/../node_modules/tsx/dist/loader.mjs"
+if [ ! -f "$TSX_LOADER" ]; then
+  TSX_LOADER="$SCRIPT_DIR/../../../tsx/dist/loader.mjs"
+fi
+if [ -f "$SOURCE_ENTRY" ] && [ -f "$TSX_LOADER" ]; then
+  exec node --import "$TSX_LOADER" "$SOURCE_ENTRY" "$@"
+fi
+DIST_ENTRY="$SCRIPT_DIR/../dist/raxode-cli/frontend/tui/cli/raxode-cli.js"
+if [ -f "$DIST_ENTRY" ]; then
+  exec node "$DIST_ENTRY" "$@"
+fi
+if [ -f "$SOURCE_ENTRY" ]; then
+  echo "Raxode could not locate the bundled tsx loader. Please reinstall the package." >&2
+else
+  echo "Raxode could not locate the compiled entrypoint. Please run npm run build or reinstall the package." >&2
+fi
+  exit 1

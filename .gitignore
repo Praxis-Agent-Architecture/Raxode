@@ -1,0 +1,96 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+
+# Agent-local
+.codex
+.codex/
+.github/skills/
+
+# Node / Web
+node_modules
+node_modules/
+dist/
+.next/
+coverage/
+.npm/
+.pnpm-store/
+*.tsbuildinfo
+
+# Rust
+target/
+
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+
+# Build outputs
+build/
+out/
+tmp/
+
+# Logs
+*.log
+.tmp-*.log
+
+# Local browser automation traces and screenshots
+.playwright-mcp/
+
+# Local compare/worktree scratch directories
+.cmp-worktrees/
+src/.cmp-worktrees/
+
+# Agent runtime scratch state
+.rax_workspace/
+.raxode/
+**/.raxode/
+realtest/
+tasks/runs/
+tasks/tmp/
+.raxode/agents/*.json
+.raxode/rewind/
+.raxode/sessions/
+
+# Large local generated/runtime artifacts regenerated from source state
+memory/generated/
+
+# One-off local TUI/Ink scratch scripts
+/test_ink_*.mjs
+/test_proxy.js
+/test_rows.mjs
+/test_tui*.js
+/test_tui*.mjs
+
+# Local secrets / live smoke config
+.env.local
+.env.*.local
+
+# Historical/local source drops kept out of the Raxode application repository.
+better-agent/
+codex-experiments/
+claudecodesource/
+docs/docs-status-baseline.md
+
+# Workspace session/agents/AGENTS.md
+.raxode/
+.raxode/AGENTS.md
+
+# Local leftovers after promoting Praxis_Agent_Architecture/ to repository root.
+/Praxis_Agent_Architecture/
+.migration-leftovers/
+
+
+
+test.workspacve/
+test.work/
+test/
+tasks/
+docs/
+memory/
+tmpmd/
